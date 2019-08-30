@@ -7,20 +7,23 @@ class Room {
   Door entrance;
   int level = 0;
   int maxLevel = 0;
+  boolean onPath = false;
+  boolean hasKey = false;
   
   public Room(float x1, float x2, float y1, float y2) {
     this.x1 = x1;
     this.x2 = x2;
     this.y1 = y1;
     this.y2 = y2;
+    this.hasKey = random(1) > .85;
   }
   
-  public void render(int maxLevel) {
+  public void render() {
     if (this.level == 0) {
       fill(COLOR_ENTRANCE);
-    } else if (this.level == maxLevel) {
+    } else if (this.onPath && this.exits.length == 0) {
       fill(COLOR_EXIT);
-    } else if (SHOW_PATH && this.maxLevel == maxLevel) {
+    } else if (SHOW_PATH && this.onPath) {
       fill(COLOR_PATH);
     } else {
       fill(COLOR_ROOM);
@@ -33,22 +36,22 @@ class Room {
     vertex(this.x1 + MARGIN, this.y2 - MARGIN);
     endShape();
     
-    this.renderLevel();
+    this.renderText();
     
     for (int i=0; i < this.exits.length; i++) {
-      this.exits[i].render(maxLevel);
+      this.exits[i].render();
     }
   }
   
-  public void renderLevel() {
-    if (!SHOW_LEVELS) return;
+  public void renderText() {
+    if (!SHOW_LEVELS && !this.hasKey) return;
     
     fill(COLOR_WALL);
     
     textSize(32);
     textAlign(CENTER, CENTER);
     textSize(32);
-    text(this.level, this.x1 + (this.x2 - this.x1) / 2, this.y1 + (this.y2 - this.y1) / 2);
+    text(this.hasKey ? "key" : this.level + "", this.x1 + (this.x2 - this.x1) / 2, this.y1 + (this.y2 - this.y1) / 2);
   }
   
   public Direction isNeighbor(Room other) {
@@ -93,5 +96,17 @@ class Room {
     }
     
     return this.maxLevel;
+  }
+  
+  public void findPath(int maxLevel) {
+    if (this.maxLevel != maxLevel) return;
+    
+    this.onPath = true;
+    
+    if (this.entrance != null) this.entrance.onPath = true;
+    
+    for (int i=0; i < this.exits.length; i++) {
+      this.exits[i].to.findPath(maxLevel);
+    }
   }
 }

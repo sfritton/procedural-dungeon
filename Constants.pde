@@ -12,3 +12,4 @@ color COLOR_WALL = color(0);
 color COLOR_ENTRANCE = color(255, 200, 200);
 color COLOR_EXIT = color(200, 200, 255);
 color COLOR_PATH = color(225, 210, 255);
+color COLOR_DOOR_LOCKED = color(255, 50, 50);

@@ -2,10 +2,13 @@ class Door {
   boolean isVertical;
   PVector position;
   Room from, to;
+  boolean onPath = false;
+  boolean locked = false;
   
   public Door(Room from, Room to) {
     this.from = from;
     this.to = to;
+    this.locked = random(1) > .85;
     
     Direction direction = from.isNeighbor(to);
     float b = 0;
@@ -43,25 +46,31 @@ class Door {
     }
   }
   
-  public void render(int maxLevel) {
-    fill(COLOR_DOOR);
+  public void render() {
+    if (this.locked) {
+      fill(COLOR_DOOR_LOCKED);
+    } else if (SHOW_PATH && this.onPath) {
+      fill(COLOR_PATH);
+    } else {
+      fill(COLOR_ROOM);
+    }
     
     if (this.isVertical) {
         beginShape();
-        vertex(this.position.x - MARGIN, this.position.y - DOOR_HALF_WIDTH);
-        vertex(this.position.x + MARGIN, this.position.y - DOOR_HALF_WIDTH);
-        vertex(this.position.x + MARGIN, this.position.y + DOOR_HALF_WIDTH);
-        vertex(this.position.x - MARGIN, this.position.y + DOOR_HALF_WIDTH);
+        vertex(this.position.x - MARGIN * 2, this.position.y - DOOR_HALF_WIDTH);
+        vertex(this.position.x + MARGIN * 2, this.position.y - DOOR_HALF_WIDTH);
+        vertex(this.position.x + MARGIN * 2, this.position.y + DOOR_HALF_WIDTH);
+        vertex(this.position.x - MARGIN * 2, this.position.y + DOOR_HALF_WIDTH);
         endShape();
     } else {
       beginShape();
-      vertex(this.position.x - DOOR_HALF_WIDTH, this.position.y - MARGIN);
-      vertex(this.position.x + DOOR_HALF_WIDTH, this.position.y - MARGIN);
-      vertex(this.position.x + DOOR_HALF_WIDTH, this.position.y + MARGIN);
-      vertex(this.position.x - DOOR_HALF_WIDTH, this.position.y + MARGIN);
+      vertex(this.position.x - DOOR_HALF_WIDTH, this.position.y - MARGIN * 2);
+      vertex(this.position.x + DOOR_HALF_WIDTH, this.position.y - MARGIN * 2);
+      vertex(this.position.x + DOOR_HALF_WIDTH, this.position.y + MARGIN * 2);
+      vertex(this.position.x - DOOR_HALF_WIDTH, this.position.y + MARGIN * 2);
       endShape();
     }
     
-    this.to.render(maxLevel);
+    this.to.render();
   }
 }

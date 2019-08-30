@@ -31,13 +31,19 @@ void keyPressed() {
 }
 
 void generateDungeon() {
+  // divide the screen into rooms
   rooms = divide(DEPTH);
+  
+  // connect those rooms with doors, storing the longest path
   maxLevel = rooms[0].findExits((Room[]) subset(rooms, 1));
+  
+  // label the path from the start to the end
+  rooms[0].findPath(maxLevel);
 }
 
 void renderDungeon() {
   background(0);
-  rooms[0].render(maxLevel);
+  rooms[0].render();
 }
 
 Room[] divide(int depth) {
