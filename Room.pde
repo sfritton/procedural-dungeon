@@ -7,6 +7,8 @@ class Room {
   Door entrance;
   int level = 0;
   int maxLevel = 0;
+  boolean isDungeonEntrance = false;
+  boolean isDungeonExit = false;
   boolean onPath = false;
   boolean hasKey = false;
   
@@ -15,13 +17,12 @@ class Room {
     this.x2 = x2;
     this.y1 = y1;
     this.y2 = y2;
-    this.hasKey = random(1) > .85;
   }
   
   public void render() {
     if (this.level == 0) {
       fill(COLOR_ENTRANCE);
-    } else if (this.onPath && this.exits.length == 0) {
+    } else if (this.isDungeonExit) {
       fill(COLOR_EXIT);
     } else if (SHOW_PATH && this.onPath) {
       fill(COLOR_PATH);
@@ -50,8 +51,16 @@ class Room {
     
     textSize(32);
     textAlign(CENTER, CENTER);
-    textSize(32);
-    text(this.hasKey ? "key" : this.level + "", this.x1 + (this.x2 - this.x1) / 2, this.y1 + (this.y2 - this.y1) / 2);
+    
+    if (this.hasKey) {
+      translate(this.x1 + (this.x2 - this.x1) / 2, this.y1 + (this.y2 - this.y1) / 2);
+      rotate(PI/2);
+      text("F", 1, -10);
+      text("O", -1, 11);
+      resetMatrix();
+    } else {
+      text(this.level, this.x1 + (this.x2 - this.x1) / 2, this.y1 + (this.y2 - this.y1) / 2);
+    }
   }
   
   public Direction isNeighbor(Room other) {
@@ -98,15 +107,100 @@ class Room {
     return this.maxLevel;
   }
   
-  public void findPath(int maxLevel) {
-    if (this.maxLevel != maxLevel) return;
+  public Room findDungeonExit() {
+    if (!this.isDungeonEntrance) return null;
     
-    this.onPath = true;
+    Room exit = this.findMaxLevelDescendent();
+    exit.isDungeonExit = true;
+    return exit;
+  }
+  
+  public Room findMaxLevelDescendent() {
+    if (this.exits.length == 0) {
+      return this;
+    }
     
-    if (this.entrance != null) this.entrance.onPath = true;
+    Room maxChild = this.exits[0].to;
+    
+    for (int i=1; i < this.exits.length; i++) {
+      Room candidate = this.exits[i].to;
+      if (candidate.maxLevel > maxChild.maxLevel)
+      
+      maxChild = candidate;
+    }
+    
+    return maxChild.findMaxLevelDescendent();
+  }
+  
+  public void findPath() {
+    if (!this.isDungeonExit) return;
+    
+    Door entrance = this.entrance;
+    
+    while (entrance != null) {
+      entrance.onPath = true;
+      entrance.from.onPath = true;
+      
+      entrance = entrance.from.entrance;
+    }
+  }
+  
+  private Door findNonPathExit() {
+    Door maxLevelNonPathExit = null;
     
     for (int i=0; i < this.exits.length; i++) {
-      this.exits[i].to.findPath(maxLevel);
+      if (this.exits[i].onPath) continue;
+      
+      if (maxLevelNonPathExit == null || this.exits[i].to.maxLevel > maxLevelNonPathExit.to.maxLevel) {
+        maxLevelNonPathExit = this.exits[i];
+      }; 
     }
+    
+    return maxLevelNonPathExit;
+  }
+  
+  private Door findPathExit() {
+    for (int i=0; i < this.exits.length; i++) {
+      if (this.exits[i].onPath) return this.exits[i]; 
+    }
+    
+    return null;
+  }
+  
+  // returns true if a key was successfully placed, false otherwise
+  public boolean placeKey() {
+    if (!this.isDungeonExit) return false;
+    
+    int distance = int(random(1, this.level - 1));
+    
+    Room room = this;
+    
+    // walk up the tree for distance levels
+    for (int i=distance; i > 0; i--) {
+      room = room.entrance.from;
+    }
+    
+    Door nonPathExit = null;
+    
+    while (nonPathExit == null) {
+      nonPathExit = room.findNonPathExit();
+    
+      if (nonPathExit == null) {
+        if (room.entrance == null) return false;
+        
+        // walk up another level
+        room = room.entrance.from;
+      }
+    }
+    
+    // place the lock
+    room.findPathExit().isLocked = true;
+    
+    Room keyRoom = nonPathExit.to.findMaxLevelDescendent();
+    
+    // place the key
+    keyRoom.hasKey = true;
+    
+    return true;
   }
 }

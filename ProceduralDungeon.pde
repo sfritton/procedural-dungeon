@@ -1,4 +1,6 @@
 Room[] rooms;
+Room dungeonEntrance;
+Room dungeonExit;
 int maxLevel = 0;
 
 void setup() {
@@ -34,16 +36,30 @@ void generateDungeon() {
   // divide the screen into rooms
   rooms = divide(DEPTH);
   
-  // connect those rooms with doors, storing the longest path
-  maxLevel = rooms[0].findExits((Room[]) subset(rooms, 1));
+  dungeonEntrance = rooms[0];
+  dungeonEntrance.isDungeonEntrance = true;
   
-  // label the path from the start to the end
-  rooms[0].findPath(maxLevel);
+  // connect those rooms with doors, storing the longest path
+  maxLevel = dungeonEntrance.findExits((Room[]) subset(rooms, 1));
+  
+  // choose an exit
+  dungeonExit = dungeonEntrance.findDungeonExit();
+  
+  // find the path from the entrance to the exit
+  dungeonExit.findPath();
+  
+  
+  int numKeys = int(random(1, 4));
+  
+  // place locks on doors along the path
+  for (int i=0; i < numKeys; i++) {
+    dungeonExit.placeKey();
+  } 
 }
 
 void renderDungeon() {
   background(0);
-  rooms[0].render();
+  dungeonEntrance.render();
 }
 
 Room[] divide(int depth) {

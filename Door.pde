@@ -3,12 +3,11 @@ class Door {
   PVector position;
   Room from, to;
   boolean onPath = false;
-  boolean locked = false;
+  boolean isLocked = false;
   
   public Door(Room from, Room to) {
     this.from = from;
     this.to = to;
-    this.locked = random(1) > .85;
     
     Direction direction = from.isNeighbor(to);
     float b = 0;
@@ -47,7 +46,7 @@ class Door {
   }
   
   public void render() {
-    if (this.locked) {
+    if (this.isLocked) {
       fill(COLOR_DOOR_LOCKED);
     } else if (SHOW_PATH && this.onPath) {
       fill(COLOR_PATH);
