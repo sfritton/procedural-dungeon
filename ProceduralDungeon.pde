@@ -72,13 +72,13 @@ void generateDungeon() {
   
   int generations = 25;
   
-  for (int i=0; i < generations; i++) {
-    // recursively choose next type for each room
-    dungeonEntrance.chooseNextTypes();
+  //for (int i=0; i < generations; i++) {
+  //  // recursively choose next type for each room
+  //  dungeonEntrance.chooseNextTypes();
     
-    // assign next type to each room
-    dungeonEntrance.updateRoomTypes();
-  }
+  //  // assign next type to each room
+  //  dungeonEntrance.updateRoomTypes();
+  //}
 }
 
 void renderDungeon() {

@@ -1,24 +1,22 @@
 enum RoomType {
-  MINI_BOSS("M", 4, 400, 1),
+  MINI_BOSS("M", 4, UNIT * 20),
   REWARD("R", 5),
-  SWARM("S", 1, 200, 0),
-  TRAP("T", 2, 400, 1),
+  SWARM("S", 1, UNIT * 10),
+  TRAP("T", 2, UNIT * 15),
   EMPTY("E", 0);
   
   public String value;
   public int minWallLength;
-  public int minNumChildren;
   public int priority;
   
   private RoomType(String value, int priority) {
-    this(value, priority, 0, 0);
+    this(value, priority, 0);
   }
   
-  private RoomType(String value, int priority, int minWallLength, int minNumChildren) {
+  private RoomType(String value, int priority, int minWallLength) {
     this.value = value;
     this.priority = priority;
     this.minWallLength = minWallLength;
-    this.minNumChildren = minNumChildren;
   }
 }
 

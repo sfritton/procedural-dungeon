@@ -58,16 +58,16 @@ class Room {
   
   public void renderKey() {
     translate(this.x1 + (this.x2 - this.x1) / 2, this.y1 + (this.y2 - this.y1) / 2);
-    rotate(PI/2);
-    text("F", 1, -10);
-    text("O", -1, 11);
+    rotate(3 * PI/4);
+    text("F", 1, -FONT_SIZE * .375 + 1);
+    text("O", -1, FONT_SIZE * .375);
     resetMatrix();
   }
   
   public void renderText() {
     fill(COLOR_WALL);
     
-    textSize(32);
+    textSize(FONT_SIZE);
     textAlign(CENTER, CENTER);
     
     if (this.hasKey) {
